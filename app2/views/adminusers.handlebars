@@ -1,0 +1,60 @@
+<!-- views/home.handlebars -->
+{{#if user}}
+<style type="text/css">
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+    background-color: #B0B0B0;
+	border-color: #B0B0B0;
+}
+
+    .popover{
+        max-width:600px;
+    }
+</style>
+<div class="col-md-offset-1 col-md-10">
+  <div class="page-header">
+    <h1>Users Administration</h1>
+  </div>
+  	{{#if users}}
+  <div class="list-group col-md-6">
+    <a class="list-group-item active"><b>Active Users</b></a>
+	
+		{{#each users}}
+			<a href="/adminusers/{{_id}}" class="list-group-item" data-toggle="popover" data-trigger="focus" title="Asociated Notifications" data-html="true" 
+				data-content="<ul><li> Asociated Notification 1<span class='label label-success'>Active</span></li><li> Asociated Notification 2<span class='label label-danger'>Disabled</span></li></ul>">
+				{{username}}<span class="badge">
+			{{#if admin}}
+				Admin
+			{{else}}
+				Owner
+			{{/if}}
+			</span></a>
+		{{/each}}
+	{{else}}
+	<p>empty userlist</p>
+	{{/if}}
+    </div>
+</div>
+  <script type="text/javascript">
+            $(document).ready(function() {
+
+                $('[data-toggle="popover"]').popover({trigger: 'hover','placement': 'right', container: 'body'});
+
+            }); //END $(document).ready()
+
+        </script>
+  
+{{else}}
+  <div class="jumbotron">
+    <h1>Smart Open Data</h1>
+	<h2>Dashboard</h2>
+    <p>Sign in and view your profile!</p>
+    <p>
+      <a href="/signin" class="btn btn-primary btn-lg" role="button">
+        <span class="glyphicon glyphicon-user"></span> 
+        Sign in!
+      </a>
+    </p>
+  </div>
+  
+{{/if}}
+

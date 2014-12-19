@@ -1,0 +1,241 @@
+{{#if user.admin}}
+<style type="text/css">
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+    background-color: #B0B0B0;
+	border-color: #B0B0B0;
+}
+</style>
+<div class="col-md-offset-1">
+	<div class="page-header">
+		<h1>Notifications Panel</h1>
+	</div>
+	{{#if notifications}}
+	<div class="list-group col-md-6">	
+		<a class="list-group-item active">
+				Details
+		</a>
+		{{#each notifications}}
+		<a href="/status/{{_id}}" class="list-group-item">
+			<span class="label label-success pull-right">Active</span>
+			<h4 class="list-group-item-heading">{{queryName}}</h4>  	
+			
+			<p class="list-group-item-text">{{queryDescription}}</p>
+		</a>
+		{{/each}}
+	</div>
+	{{else}}
+	<div class="list-group col-md-6">
+		<a class="list-group-item active">
+				No Notifications
+		</a>
+	</div>
+	{{/if}}
+</div>	
+
+<script type="text/javascript">
+	$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+      numFiles = input.get(0).files ? input.get(0).files.length : 1,
+      label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+var paramoptions1 = 1;
+var metaoptions1 = 1;
+
+$(document).ready( function() {
+    $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+        
+        var input = $(this).parents('.input-group').find(':text'),
+            log = numFiles > 1 ? numFiles + ' files selected' : label;
+        
+        if( input.length ) {
+            input.val(log);
+        } else {
+            if( log ) alert(log);
+        }
+        
+    });
+
+    // The maximum number of options
+    
+
+    $('#surveyForm')	
+		 // Add button click handler
+        .on('click', '.addButton1', function() {
+			metaoptions1++;
+            var $template = $('#optionTemplate1'),
+                $clone    = $template
+                                .clone()
+                                .removeClass('hide')
+                                .removeAttr('id')
+								.attr('id','metafield'+metaoptions1)
+                                .insertBefore($template),
+                $option   = $clone.find('[name="option[]1"]');
+				document.getElementById('metafield'+metaoptions1).getElementsByTagName('input')[0].id = ('metafield');
+				
+
+            // Add new field
+        })
+		
+		.on('click', '.addButton2', function() {
+			paramoptions1++;
+            var $template = $('#optionTemplate2'),
+                $clone    = $template
+                                .clone()
+                                .removeClass('hide')
+                                .removeAttr('id')
+								.attr('id','paramfield'+paramoptions1)
+                                .insertBefore($template),
+                $option   = $clone.find('[name="option[]2"]');
+				document.getElementById('paramfield'+paramoptions1).getElementsByTagName('input')[0].id = ('paramfield');
+
+            // Add new field
+        })
+
+        // Remove button click handler
+        .on('click', '.removeButton1', function() {
+			metaoptions1--;
+            var $row    = $(this).parents('.form-group'),
+                $option = $row.find('[name="option[]1"]');
+
+            // Remove element containing the option
+            $row.remove();
+	
+            // Remove field
+        })
+		
+		.on('click', '.removeButton2', function() {
+		paramoptions1--;
+            var $row    = $(this).parents('.form-group'),
+                $option = $row.find('[name="option[]2"]');
+
+            // Remove element containing the option
+            $row.remove();
+
+            // Remove field
+        });
+
+        
+});
+
+
+      function loadjsonfile(content){
+		resetFields();
+		var jsonData = JSON.parse(content);
+		document.getElementById('idfield').value=  jsonData.sparqlquery.id;
+		document.getElementById('descfield').value=  jsonData.sparqlquery.desc;
+		document.getElementById('namefield').value=  jsonData.sparqlquery.name;
+		var meta = jsonData.sparqlquery.meta;
+		document.getElementById('metafield1').value=  meta[0];
+		if(meta.length>1){
+			for (x=0;x<meta.length-1;x++)
+				addmetafield();
+			}
+		var metaelements = document.getElementsByName('option[]1');
+			for (x=0;x<metaelements.length;x++)
+				metaelements[x].value= meta[x+1];
+			
+			
+		var param = jsonData.sparqlquery.param;
+		document.getElementById('paramfield1').value=  param.$1;
+			var loop=0;
+			for (var key in param){
+				loop++;
+				}
+			for (x=0;x<loop-1;x++){
+				addparamfield();
+			}
+			loop=0;
+			var paramelements = document.getElementsByName('option[]2');
+			for (var key in param){
+				if(loop>0){
+
+				paramelements[loop-1].value= param[key];}
+				loop++;
+				}
+				
+		
+		
+		document.getElementById('queryfield').value=  jsonData.sparqlquery.query;
+	}
+	
+	function readSingleFile(evt) {
+        //Retrieve the first (and only!) File from the FileList object
+        var f = evt.target.files[0]; 
+
+        if (f) {
+			var r = new FileReader();
+			r.onload = function(e) { 
+				var contents = e.target.result;
+				document.getElementById('area').value=  contents;
+				loadjsonfile(contents);
+			}
+			r.readAsText(f);
+			
+			
+        } else { 
+			alert("Failed to load file");
+        }
+      }
+	  
+	  function addmetafield(){
+		metaoptions1++;
+            var $template = $('#optionTemplate1'),
+                $clone    = $template
+                                .clone()
+                                .removeClass('hide')
+                                .removeAttr('id')
+								.attr('id','metafield'+metaoptions1)
+                                .insertBefore($template),
+                $option   = $clone.find('[name="option[]1"]');
+				document.getElementById('metafield'+metaoptions1).getElementsByTagName('input')[0].id = ('metafield');
+	  }
+	   function addparamfield(){
+	   paramoptions1++;
+            var $template = $('#optionTemplate2'),
+                $clone    = $template
+                                .clone()
+                                .removeClass('hide')
+                                .removeAttr('id')
+								.attr('id','paramfield'+paramoptions1)
+                                .insertBefore($template),
+                $option   = $clone.find('[name="option[]2"]');
+				document.getElementById('paramfield'+paramoptions1).getElementsByTagName('input')[0].id = ('paramfield');
+	   }
+	   
+	   
+	   function resetFields(){
+		   var metaelements = document.getElementsByName('option[]1');
+				while(metaelements.length>1){
+					$($(metaelements[0]).parents('.form-group')).remove();
+				}
+			var paramelements = document.getElementsByName('option[]2');
+				while(paramelements.length>1){
+					$($(paramelements[0]).parents('.form-group')).remove();
+				}	
+			 
+		}
+	   
+
+		document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+		document.getElementById('test').addEventListener('click', resetFields);
+    
+	
+</script>	
+
+
+{{else}}
+  <div class="jumbotron">
+    <h1>Smart Open Data</h1>
+	<h2>Dashboard</h2>
+    <p>Sign in and view your profile!</p>
+    <p>
+      <a href="/signin" class="btn btn-primary btn-lg" role="button">
+        <span class="glyphicon glyphicon-user"></span> 
+        Sign in!
+      </a>
+    </p>
+  </div>
+  
+{{/if}}

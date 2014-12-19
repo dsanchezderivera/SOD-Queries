@@ -1,0 +1,88 @@
+{{#if user.admin}}
+<style type="text/css">
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+</style>
+<div class="col-md-offset-1">
+	<div class="page-header">
+		<h1>New Query Notification</h1>
+	</div>
+	
+	<div class="col-lg-6">
+		<label class="control-label">Search query template:</label>
+		<div class="input-group">
+			<div class="input-group-btn">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Standar Query<span class="caret"></span></button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Standar Query</a></li>
+					</ul>
+			</div>
+			<input type="text" class="form-control">
+		</div>
+		<br></br>
+		<form method="post" role="form">
+			<div class="form-group">
+				<label class="control-label">Query content:</label>
+				<textarea type="text" rows="7" class="form-control" id="querytextfield" name="querytext"></textarea>
+			</div>
+			<br></br>
+			<h4>Parameters to configure:</h4>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Query End-Point</label>
+				<input type="text" class="form-control" id="endpointfield" name="endpoint">
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Name</label>
+				<input type="text" class="form-control" id="namefield" name="name">
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Description</label>
+				<input type="text" class="form-control" id="descfield" name="desc">
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Parameters</label>
+				<input type="text" class="form-control" id="paramfield" name="param">
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-1 col-sm-10">
+					<button type="submit" class="btn btn-default">Send & Active Notification</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+
+
+{{else}}
+  <div class="jumbotron">
+    <h1>Smart Open Data</h1>
+	<h2>Dashboard</h2>
+    <p>Sign in and view your profile!</p>
+    <p>
+      <a href="/signin" class="btn btn-primary btn-lg" role="button">
+        <span class="glyphicon glyphicon-user"></span> 
+        Sign in!
+      </a>
+    </p>
+  </div>
+  
+{{/if}}

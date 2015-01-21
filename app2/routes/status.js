@@ -38,4 +38,24 @@ router.post('/:notId/delete', function(req, res){
 	});
 });
 
+router.post('/:notId/edit', function(req, res){
+	console.log("Editing!!!" + req.param("notId"));
+	var newquery = {};
+	newquery._id = req.param("notId");
+	newquery.queryName = req.body.name;
+	newquery.queryDescription = req.body.desc;
+	newquery.queryEndpoint = req.body.endpoint;
+	newquery.query = (req.body.querytext).replace(/(\r\n|\n|\r)/gm,"").replace(/\s+/g," ");
+	console.log("Edited query: " + JSON.stringify(newquery, undefined, 2));
+	req.db.QueryNotifications.findByIdAndUpdate(newquery._id, 
+			{$set: {queryname: newquery.queryname, queryDescription: newquery.queryDescription, queryEndpoint: newquery.queryEndpoint, query: newquery.query}}, function (err, query) {
+  				if (err) console.log("Error: " + err);
+  			req.mqtt.publish('updatequeriestopic', JSON.stringify(newquery, undefined, 2));
+  			console.log("Published changes to updatequeriestopic");
+  			req.session.success = 'Notification updated succesfully!';
+  			res.redirect('/status');	
+		});
+	
+});
+
 module.exports = router;

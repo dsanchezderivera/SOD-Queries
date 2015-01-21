@@ -201,7 +201,7 @@ console.log("Subscribed to queryupdates Topic!");
 mqttc.mqttclient.on('message', function(topic, message) {
   console.log("!!!!!!!!!!!!!!!!!!!MQTT Udpate received: "+message);
   var objJson = JSON.parse(message);
-  QueryNotifications.findByIdAndUpdate(objJson._id, { $set: { lastresult: objJson.lastresult }}, function (err, querydata) {
+  dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, { $set: { lastresult: objJson.lastresult }}, function (err, querydata) {
 	if(!err){ 
 		console.log("Update added to BD");
 	}else{

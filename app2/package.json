@@ -1,7 +1,7 @@
 {
-  "name": "userAuth",
+  "name": "SOD_Querys",
   "version": "0.0.1",
-  "description": "Tutorial walking through user Auth with express passport and Orchestrate",
+  "description": "Smart Open Data Query Changes Notification",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

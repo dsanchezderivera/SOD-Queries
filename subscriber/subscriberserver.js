@@ -37,6 +37,8 @@ mqttclient.subscribe('newqueriestopic');
 console.log("Subscribed to newequeriestopic");
 mqttclient.subscribe('deletequeriestopic');
 console.log("Subscribed to deletequeriestopic");
+mqttclient.subscribe('updatequeriestopic');
+console.log("Subscribed to updatequeriestopic");
 
 mqttclient.on('message', function(topic, message, packet) {
 		
@@ -96,7 +98,15 @@ mqttclient.on('message', function(topic, message, packet) {
 		});
 	}
 	//=======================================UPDATE QUERIES=======================================
-	else if(topic == 'updatequeriestopic'){}
+	else if(topic == 'updatequeriestopic'){
+		console.log("Updating query: "+ message);
+		var objJson = JSON.parse(message);
+		QueryNotifications.findByIdAndUpdate(objJson._id, 
+			{$set: {queryname: objJson.objJson, queryDescription: objJson.queryDescription, queryEndpoint: objJson.queryEndpoint, query: objJson.query}}, function (err, query) {
+  				if (err) console.log("Error: " + err);
+  			console.log("Udpated query on db");
+		});
+	}
 	//======================================DELETE QUERIES========================================
 	else if(topic == 'deletequeriestopic'){
 		console.log("Deleting query id: "+ message);
@@ -110,8 +120,6 @@ mqttclient.on('message', function(topic, message, packet) {
 		});
 	}
 });
-
-//=======================================UPDATE QUERIES=======================================
 
 
 
@@ -145,7 +153,7 @@ var routineTimer = setTimeout(function() {
 			//=========HTTPGET============== (Fetching data and publishing if ok)
 			http.get(urlstring, function(res) {
 				var objJson2 = doc;
-				console.log('STATUS: ' + res.statusCode);
+				console.log('STATUS: ' + res.statusCode + 'id: '+doc._id);
 				//console.log('HEADERS: ' + JSON.stringify(res.headers));
 				res.setEncoding('utf8');
 				var body = "";

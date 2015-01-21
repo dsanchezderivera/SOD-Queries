@@ -16,7 +16,8 @@ router.post('/', function(req, res){
 		active: true,
 		lastupdated: new Date,
 		lastresult: "empty",
-		changes: false
+		changes: false,
+		ack: false
 	});
 	req.db.UserDetails.update({_id: req.user._id},{$push: { 'notifications' : newquery._id }},{upsert:true}, function(err, data) {
 		if(err){ 

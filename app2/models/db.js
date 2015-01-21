@@ -32,7 +32,8 @@ var QueryNotification = new Schema({
 		active: Boolean,
 		lastupdated: { type: Date, default: Date.now },
 		lastresult: String,
-		changes: Boolean
+		changes: Boolean,
+		ack: Boolean
     }, {
 		collection: 'querynotifications'
     });

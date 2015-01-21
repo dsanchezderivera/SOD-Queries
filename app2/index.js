@@ -116,7 +116,7 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 
 //===============EXPRESS================
 // Configure Express
-app.use(logger('combined'));
+app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -166,10 +166,6 @@ app.use('/metaquerygen', r_metaquerygen);
 app.use('/adminusers', r_adminusers);
 
 
-
-
-
-
 //sends the request through our local signup strategy, and if successful takes user to homepage, otherwise returns then to signin page
 app.post('/local-reg', passport.authenticate('local-signup', {
   successRedirect: '/',
@@ -194,23 +190,40 @@ app.get('/logout', function(req, res){
 });
 
 
-//===============MQTT Receive Updates=================
+//===============MQTT==============================================
 
 mqttc.mqttclient.subscribe('queryupdates');
 console.log("Subscribed to queryupdates Topic!");
+mqttc.mqttclient.subscribe('queryacks');
+console.log("Subscribed to queryACKs Topic!");
+
+
 mqttc.mqttclient.on('message', function(topic, message) {
-  console.log("!!!!!!!!!!!!!!!!!!!MQTT Udpate received: "+message);
-  var objJson = JSON.parse(message);
-  dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, { $set: { lastresult: objJson.lastresult }}, function (err, querydata) {
-	if(!err){ 
-		console.log("Update added to BD");
-	}else{
-		console.log("Error adding document to notifications DB from MQTT");
-		}
-	});
+	//===============MQTT Receive Updates=================
+	if(topic == 'queryupdates'){
+		var objJson = JSON.parse(message);
+		console.log("!!!!!!!!!!!!!!!!!!!MQTT Udpate received for id: "+objJson._id);
+		dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, { $set: { 
+			lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes }}, function (err, querydata) {
+			if(!err){ 
+				console.log("Update added to BD");
+			}else{
+				console.log("Error adding document to notifications DB from MQTT");
+			}
+		});
+	}
+	//===============MQTT Receive ACKs=================
+	else if(topic == 'queryacks'){
+		console.log("ACK received for id : "+message);
+		dbmodel.QueryNotifications.findByIdAndUpdate(message, { $set: { ack: true }}, function (err, querydata) {
+			if(!err){ 
+				console.log("ACK Update added to BD");
+			}else{
+				console.log("Error adding ACK from MQTT");
+			}
+		});
+	}
 });
-
-
 
 
 //===============PORT=================

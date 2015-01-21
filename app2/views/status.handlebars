@@ -4,6 +4,9 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     background-color: #B0B0B0;
 	border-color: #B0B0B0;
 }
+.withchanges{
+	background-color: orange;
+}
 </style>
 <div class="col-md-offset-1">
 	<div class="page-header">
@@ -15,7 +18,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 				Details
 		</a>
 		{{#each notifications}}
-		<a href="/status/{{_id}}" class="list-group-item">
+		<a href="/status/{{_id}}" class="list-group-item{{#if changes}} withchanges{{/if}}">
 			<span class="label label-success pull-right">Active</span>
 			<h4 class="list-group-item-heading">{{queryName}}</h4>  	
 			

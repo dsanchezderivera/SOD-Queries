@@ -46,6 +46,25 @@ mqttclient.on('message', function(topic, message, packet) {
 	//============================NEW QUERIES=================================	
 	if(topic == 'newqueriestopic'){
 		var objJson = JSON.parse(message);
+		var newquery = new QueryNotifications({
+					_id: objJson._id,
+					queryName: objJson.queryName,
+					queryDescription: objJson.queryDescription,
+					queryEndpoint: objJson.queryEndpoint,
+					query: objJson.query,
+					users: objJson.users,
+					active: objJson.active,
+					lastupdated: objJson.lastupdated,
+					lastresult: objJson.lastresult,
+					changes: objJson.changes
+				});
+				newquery.save(function(err,newquerydata){
+					if(err){ 
+						console.log("Error adding document to notifications DB on serverside");
+					}
+					console.log("New Query Saved!!!!!!!!!!!1");
+					mqttclient.publish('queryacks', objJson._id);
+				});
 		console.log("ObjetoJSON.query: "+ objJson.query);
 		var options = {
 			hostname: objJson.queryEndpoint,
@@ -65,7 +84,7 @@ mqttclient.on('message', function(topic, message, packet) {
 				body += chunk;
 			});
 			res.on('end', function(){
-				console.log('BODY: ' + body);
+				//console.log('BODY: ' + body);
 				objJson2.lastresult = body;
 				objJson2.lastupdated = new Date;
 				objJson2.changes = true;
@@ -75,21 +94,12 @@ mqttclient.on('message', function(topic, message, packet) {
 				//If response ok, publish data
 				mqttclient.publish('queryupdates', jsonstring);
 				console.log("Published to Topic: queryupdates");
-				var newquery = new QueryNotifications({
-					_id: objJson2._id,
-					queryName: objJson2.queryName,
-					queryDescription: objJson2.queryDescription,
-					queryEndpoint: objJson2.queryEndpoint,
-					query: objJson2.query,
-					users: objJson2.users,
-					active: objJson2.active,
-					lastupdated: objJson2.lastupdated,
-					lastresult: objJson2.lastresult,
-					changes: objJson2.changes
-				});
-				newquery.save(function(err,newquerydata){
-					if(err){ 
-						console.log("Error adding document to notifications DB on serverside");
+				QueryNotifications.findByIdAndUpdate(objJson2._id, { $set: { 
+					lastresult: objJson2.lastresult, lastupdated: objJson2.lastupdated, changes:objJson2.changes }}, function (err, querydata) {
+					if(!err){ 
+						console.log("Update added to BD at first httpget");
+					}else{
+						console.log("Error adding document to notifications DB at first httpget");
 					}
 				});
 			})
@@ -104,6 +114,7 @@ mqttclient.on('message', function(topic, message, packet) {
 		QueryNotifications.findByIdAndUpdate(objJson._id, 
 			{$set: {queryname: objJson.objJson, queryDescription: objJson.queryDescription, queryEndpoint: objJson.queryEndpoint, query: objJson.query}}, function (err, query) {
   				if (err) console.log("Error: " + err);
+  			mqttclient.publish('queryacks', objJson._id);	
   			console.log("Udpated query on db");
 		});
 	}
@@ -168,25 +179,16 @@ var routineTimer = setTimeout(function() {
 							objJson2.lastupdated = new Date;
 							objJson2.changes = true;
 							var jsonstring = JSON.stringify(objJson2, undefined, 2);
-							console.log("OBJECT: " + jsonstring);
+							//console.log("OBJECT: " + jsonstring);
 							//If response ok, publish data
 							mqttclient.publish('queryupdates', jsonstring);
 							console.log("Published to Topic: queryupdates");
-							var newquery = new QueryNotifications({
-								_id: objJson2._id,
-								queryName: objJson2.queryName,
-								queryDescription: objJson2.queryDescription,
-								queryEndpoint: objJson2.queryEndpoint,
-								query: objJson2.query,
-								users: objJson2.users,
-								active: objJson2.active,
-								lastupdated: objJson2.lastupdated,
-								lastresult: objJson2.lastresult,
-								changes: objJson2.changes
-							});
-							newquery.save(function(err,newquerydata){
-								if(err){ 
-								console.log("Error adding document to notifications DB on serverside");
+							QueryNotifications.findByIdAndUpdate(objJson2._id, { $set: { 
+								lastresult: objJson2.lastresult, lastupdated: objJson2.lastupdated, changes : objJson2.changes }}, function (err, querydata) {
+								if(!err){ 
+									console.log("Update added to BD on serverside");
+								}else{
+									console.log("Error adding document to notifications DB on serverside"+ err);
 								}
 							});
 						}else{

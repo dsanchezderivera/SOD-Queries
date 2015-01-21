@@ -10,9 +10,15 @@ router.get('/', function(req, res){
 });
 
 router.get('/:notId', function(req, res){
-		req.db.QueryNotifications.findOne({"_id": req.param("notId")}, function(err, not){
-			console.log("Fetching info for:" + not);
-			res.render('shownotification', {user: req.user, infonotification: not});
+		req.db.QueryNotifications.findByIdAndUpdate(req.param("notId"), {$set: {changes: false}}, function(err, not){
+			if(err){
+				console.log("Error getting document"+err);
+				req.session.error = 'Error deleting'+err;
+				res.redirect('/status');
+			}else{
+				console.log("Fetching info for:" + not._id);
+				res.render('shownotification', {user: req.user, infonotification: not});
+			}	
 		});
 });
 
@@ -46,7 +52,7 @@ router.post('/:notId/edit', function(req, res){
 	newquery.queryDescription = req.body.desc;
 	newquery.queryEndpoint = req.body.endpoint;
 	newquery.query = (req.body.querytext).replace(/(\r\n|\n|\r)/gm,"").replace(/\s+/g," ");
-	console.log("Edited query: " + JSON.stringify(newquery, undefined, 2));
+	//console.log("Edited query: " + JSON.stringify(newquery, undefined, 2));
 	req.db.QueryNotifications.findByIdAndUpdate(newquery._id, 
 			{$set: {queryname: newquery.queryname, queryDescription: newquery.queryDescription, queryEndpoint: newquery.queryEndpoint, query: newquery.query}}, function (err, query) {
   				if (err) console.log("Error: " + err);

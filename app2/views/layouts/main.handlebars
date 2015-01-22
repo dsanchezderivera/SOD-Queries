@@ -39,6 +39,14 @@
 			<ul class="nav navbar-nav">
 				<li>
 					{{#if user}}
+          <script src="/socket.io/socket.io.js"></script>
+          <script>
+              var socket = io();
+              socket.on('message', function(msg){
+                console.log("new message: " + msg);
+                $('#realtimetab').append("ACK");
+              });
+          </script>
 					<p class="navbar-text">
 						<strong>Hello,</strong>
 						{{user.username}}
@@ -47,6 +55,7 @@
 				<li><a href="/">Home</a></li>
 				<li><a href="/newquery">New Query</a></li>
 				<li><a href="/status">Notifications</a></li>
+        <li><a id="realtimetab">Real Time - </a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">

@@ -190,6 +190,11 @@ app.get('/logout', function(req, res){
 });
 
 
+
+//===============PORT=================
+var port = process.env.PORT || 5000; //select your port or let it pull from your .env file
+var io = require("socket.io").listen(app.listen(port));
+
 //===============MQTT==============================================
 
 mqttc.mqttclient.subscribe('queryupdates');
@@ -214,7 +219,8 @@ mqttc.mqttclient.on('message', function(topic, message) {
 	}
 	//===============MQTT Receive ACKs=================
 	else if(topic == 'queryacks'){
-		console.log("ACK received for id : "+message);
+		console.log("ACK received for id: "+message);
+		io.emit('Ack received');
 		dbmodel.QueryNotifications.findByIdAndUpdate(message, { $set: { ack: true }}, function (err, querydata) {
 			if(!err){ 
 				console.log("ACK Update added to BD");
@@ -222,11 +228,22 @@ mqttc.mqttclient.on('message', function(topic, message) {
 				console.log("Error adding ACK from MQTT");
 			}
 		});
-	}
+	}	
 });
 
 
-//===============PORT=================
-var port = process.env.PORT || 5000; //select your port or let it pull from your .env file
-app.listen(port);
+
+
+console.log("Socket.io initialized");
 console.log("listening on " + port + "!");
+app.set("io", io);
+
+
+//===============SOCKETIO=================
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
+
+io.on('message', function(msg){
+  console.log('new message: '+msg);
+});

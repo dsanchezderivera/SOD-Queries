@@ -220,7 +220,7 @@ mqttc.mqttclient.on('message', function(topic, message) {
 	//===============MQTT Receive ACKs=================
 	else if(topic == 'queryacks'){
 		console.log("ACK received for id: "+message);
-		io.emit('Ack received');
+		io.send('Ack received');
 		dbmodel.QueryNotifications.findByIdAndUpdate(message, { $set: { ack: true }}, function (err, querydata) {
 			if(!err){ 
 				console.log("ACK Update added to BD");
@@ -242,8 +242,15 @@ app.set("io", io);
 //===============SOCKETIO=================
 io.on('connection', function(socket){
   console.log('a user connected');
-});
-
-io.on('message', function(msg){
-  console.log('new message: '+msg);
+	socket.on('message', function(msg){
+		console.log('new message: '+msg);
+		dbmodel.QueryNotifications.count({users: {$in:[msg]}, changes: true},function(err, count){
+			if(!err){ 
+				if(count != 0)
+					socket.send('Ack received');
+			}else{
+				console.log("error in query"+err);
+			}
+		});
+	});
 });

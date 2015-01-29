@@ -135,11 +135,6 @@ mqttclient.on('message', function(topic, message, packet) {
 
 
 
-
-
-
-
-
 //===========================================================================================
 //===========================================================================================
 
@@ -201,7 +196,7 @@ var routineTimer = setTimeout(function() {
 			});
 		});
 	});
-	mqttclient.publish('queryacks', "test");	
+	//mqttclient.publish('queryacks', "test");	
 	console.log("Routine ended");
 	routineTimer = setTimeout(arguments.callee, repeatTime*4);
 }, repeatTime);

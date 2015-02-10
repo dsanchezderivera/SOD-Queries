@@ -4,7 +4,8 @@ var express = require('express'),
 	Schema = mongoose.Schema,
 	mqttclient = mqtt.createClient(),
 	http = require("http"),
-	https = require("https");
+	https = require("https"),
+	url = require("url");
 	
 	
 	
@@ -69,7 +70,10 @@ mqttclient.on('message', function(topic, message, packet) {
 		var options = {
 			hostname: objJson.queryEndpoint,
 			path: ("?query=" + encodeURIComponent(objJson.query)) ,
-			method: 'GET'
+			method: 'GET',
+			headers: {
+    			'Accept': 'application/json',
+ 			}
 		};
 		var urlstring = options.hostname + options.path;
 		console.log("STRING: "+ urlstring);
@@ -149,23 +153,29 @@ var routineTimer = setTimeout(function() {
 				return;
 			}	
 			//console.log(doc);
+			parseurl = url.parse(doc.queryEndpoint);
+			console.log('URL: ' + JSON.stringify(parseurl));
 			var options = {
-				hostname: doc.queryEndpoint,
-				path: ("?query=" + encodeURIComponent(doc.query)) ,
-				method: 'GET'
+				hostname: parseurl.hostname,
+				path: parseurl.path+'?query=' + encodeURIComponent(doc.query),
+				port: parseurl.port,
+				method: 'GET',
+				headers: {
+    				'Accept': 'application/sparql-results+json'
+ 				}
 			};
-			var urlstring = options.hostname + options.path;
-			//console.log("EXECUTING STRING!!!!!!!!!!!!: "+ urlstring);
+			console.log('URL: '+options.hostname + options.path+options.search);
 			//=========HTTPGET============== (Fetching data and publishing if ok)
-			http.get(urlstring, function(res) {
+			http.get(options, function(res) {
 				var objJson2 = doc;
-				console.log('STATUS: ' + res.statusCode + 'id: '+doc._id);
-				//console.log('HEADERS: ' + JSON.stringify(res.headers));
+				console.log('STATUS: ' + res.statusCode + '. For id: '+doc._id);
+				console.log('HEADERS: ' + JSON.stringify(res.headers));
 				res.setEncoding('utf8');
 				var body = "";
 				res.on('data', function (chunk) {
 					body += chunk;
 				});
+				console.log('BODY: '+body);
 				res.on('end', function(){
 					if(res.statusCode == 200){
 						if(body != objJson2.lastresult){

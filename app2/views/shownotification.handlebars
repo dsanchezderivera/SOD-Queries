@@ -13,7 +13,6 @@
 	<a data-toggle="collapse" href="#result-data" class="btn btn-default btn-md" role="button">Show result data</a>
 	<a href="#" class="btn btn-default btn-md" role="button">Display results</a>
 	<div id="result-data" class="collapse">
-    <p><i>Result:</i> {{infonotification.lastresult}} </p>
   </div>
 
   <br></br>
@@ -29,35 +28,35 @@
   <div id="editfields" class="collapse">
     <br></br>
     <div class="col-md-8">
-    <form method="post" action="{{infonotification._id}}/edit" role="form">
-      <div class="form-group">
-        <label class="control-label">Query content:</label>
-        <textarea type="text" rows="7" class="form-control" id="querytextfield" name="querytext">{{infonotification.query}}</textarea>
-      </div>
-      <br></br>
-      <h4>Parameters to configure:</h4>
-      <div class="form-group">
-        <label class="col-sm-4 control-label">Query End-Point</label>
-        <input type="text" class="form-control" id="endpointfield" name="endpoint" value="{{infonotification.queryEndpoint}}">
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Name</label>
-        <input type="text" class="form-control" id="namefield" name="name" value="{{infonotification.queryName}}">
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Description</label>
-        <input type="text" class="form-control" id="descfield" name="desc" value="{{infonotification.queryDescription}}">
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Parameters</label>
-        <input type="text" class="form-control" id="paramfield" name="param">
-      </div>
-      <div class="form-group">
-        <div class="col-sm-offset-1 col-sm-10">
-          <button type="submit" class="btn btn-default">Send & Update Notification</button>
+      <form method="post" action="{{infonotification._id}}/edit" role="form">
+        <div class="form-group">
+          <label class="control-label">Query content:</label>
+          <textarea type="text" rows="7" class="form-control" id="querytextfield" name="querytext">{{infonotification.query}}</textarea>
+        </div>
+        <br></br>
+        <h4>Parameters to configure:</h4>
+        <div class="form-group">
+          <label class="col-sm-4 control-label">Query End-Point</label>
+          <input type="text" class="form-control" id="endpointfield" name="endpoint" value="{{infonotification.queryEndpoint}}">
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Name</label>
+          <input type="text" class="form-control" id="namefield" name="name" value="{{infonotification.queryName}}">
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <input type="text" class="form-control" id="descfield" name="desc" value="{{infonotification.queryDescription}}">
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Parameters</label>
+          <input type="text" class="form-control" id="paramfield" name="param">
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-1 col-sm-10">
+            <button type="submit" class="btn btn-default">Send & Update Notification</button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   </form>
 </div>
@@ -78,6 +77,30 @@ $('#delete').submit(function(e) {
     }
   });
 });
+
+var json = {{{infonotification.lastresult}}};
+var html = "<br><table border='1'>";
+html += "<tr style='font-weight: bold;'>";
+for (var x in json.head.vars) { 
+      html += "<td>" + json.head.vars[x] + "</td>";
+  }
+html += "</tr>";
+for (var b in json.results.bindings) {
+  html += "<tr>";
+  for (var x in json.head.vars) { 
+    var value = json.results.bindings[b][json.head.vars[x]];
+    if (value.type == "uri")
+      html += "<td style='word-break:break-all; min-width:150px;'><a href='"+value.value+"'>" + value.value + "</a></td>";
+    else if (value.type == "typed-literal")
+      html += "<td><button id='button_"+b+"'>Show</button></td>";
+    else
+      html += "<td>" + value.value + "</td>";
+  }
+  html += "</tr>";
+}
+html += "</table>";
+document.getElementById("result-data").innerHTML = html;
+
 </script>
 {{else}}
 <div class="jumbotron">

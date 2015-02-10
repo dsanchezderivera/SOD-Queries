@@ -17,6 +17,7 @@ exports.UserDetails = mongoose.model('usercollection', UserDetail);
 
 var Group = new Schema({
 		groupName: String,
+		accessLevel: Number,
 		users: [{type: Schema.Types.ObjectId, ref: 'UserDetails'}]
     }, {
 		collection: 'groups'

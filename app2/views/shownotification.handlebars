@@ -10,11 +10,13 @@
 	<h3> Notification: <b>{{infonotification.queryName}}</b></h3>
 	<p><i>End point:</i> {{infonotification.queryEndpoint}} </p>
 	<p><i>Query:</i> {{infonotification.query}} </p>
-	<a data-toggle="collapse" href="#result-data" class="btn btn-default btn-md" role="button">Show result data</a>
+	<a data-toggle="collapse" href="#results" class="btn btn-default btn-md" role="button">Show result data</a>
 	<a href="#" class="btn btn-default btn-md" role="button">Display results</a>
-	<div id="result-data" class="collapse">
+  <div id="results" class="collapse">
+    <div id="result-data"></div>
+    <br>
+    <div id="mapdiv" style="height: 400px;"></div>
   </div>
-
   <br></br>
   <p><i>Last Updated:</i> {{infonotification.lastupdated}} </p>
   <p><i>Server acked:</i> {{infonotification.ack}} </p>
@@ -56,10 +58,9 @@
             <button type="submit" class="btn btn-default">Send & Update Notification</button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
-  </form>
-</div>
+  </div>
 </div>
 {{else}}
 <p>No Notification</p>
@@ -82,8 +83,8 @@ var json = {{{infonotification.lastresult}}};
 var html = "<br><table border='1'>";
 html += "<tr style='font-weight: bold;'>";
 for (var x in json.head.vars) { 
-      html += "<td>" + json.head.vars[x] + "</td>";
-  }
+  html += "<td>" + json.head.vars[x] + "</td>";
+}
 html += "</tr>";
 for (var b in json.results.bindings) {
   html += "<tr>";
@@ -92,7 +93,7 @@ for (var b in json.results.bindings) {
     if (value.type == "uri")
       html += "<td style='word-break:break-all; min-width:150px;'><a href='"+value.value+"'>" + value.value + "</a></td>";
     else if (value.type == "typed-literal")
-      html += "<td><button id='button_"+b+"'>Show</button></td>";
+      html += "<td><button class='show_button' id='button_"+b+"'>Show</button></td>";
     else
       html += "<td>" + value.value + "</td>";
   }
@@ -100,6 +101,37 @@ for (var b in json.results.bindings) {
 }
 html += "</table>";
 document.getElementById("result-data").innerHTML = html;
+
+</script>
+<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+<script>
+$('.show_button').on('click', function(e){
+    map = new OpenLayers.Map("mapdiv");
+  map.addLayer(new OpenLayers.Layer.OSM());
+
+  wktFormat = new OpenLayers.Format.WKT();
+
+  var vectorLayer = new OpenLayers.Layer.Vector("WKT", {
+    protocol: new OpenLayers.Protocol.HTTP({
+      url: "./wkt-example.wkt",
+      format: wktFormat
+    }),
+    strategies: [new OpenLayers.Strategy.Fixed()]
+  });
+
+  map.addLayer(vectorLayer);
+
+  //Set start centrepoint and zoom
+  //TODO: Is it possible to just zoom to extents of KML objects instead?
+  
+  var lonLat = new OpenLayers.LonLat( -0.1279688 ,51.5077286 )
+  .transform(
+          new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+          map.getProjectionObject() // to Spherical Mercator Projection
+          );
+  var zoom=16;
+  map.setCenter (lonLat, zoom);  
+  });
 
 </script>
 {{else}}

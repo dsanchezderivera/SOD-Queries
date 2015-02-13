@@ -39,3 +39,15 @@ var QueryNotification = new Schema({
 		collection: 'querynotifications'
     });
 exports.QueryNotifications = mongoose.model('querynotifications', QueryNotification);
+
+var QueryTemplate = new Schema({
+		templateName: String,
+		templateDescription: String,
+		templateEndpoint: String,
+		templateQuery: String,
+		parameters: [{name: String, defaultparam: String}],
+		metadata: [String]
+    }, {
+		collection: 'querytemplates'
+    });
+exports.QueryTemplates = mongoose.model('querytemplates', QueryTemplate);

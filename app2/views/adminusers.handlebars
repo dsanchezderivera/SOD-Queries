@@ -19,7 +19,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
     <a class="list-group-item active"><b>Active Users</b></a>
 	
 		{{#each users}}
-			<a href="/adminusers/{{_id}}" class="list-group-item" data-toggle="popover" data-trigger="focus" title="Asociated Notifications" data-html="true" 
+			<a href="/adminusers/admin/{{_id}}" class="list-group-item" data-toggle="popover" data-trigger="focus" title="Asociated Notifications" data-html="true" 
 				data-content="<ul><li> Asociated Notification 1<span class='label label-success'>Active</span></li><li> Asociated Notification 2<span class='label label-danger'>Disabled</span></li></ul>">
 				{{username}}<span class="badge">
 			{{#if admin}}

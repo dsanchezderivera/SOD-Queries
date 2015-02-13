@@ -12,7 +12,7 @@ router.get('/', function(req, res){
 	});
 });
 
-router.get('/:userId', function(req, res){
+router.get('/admin/:userId', function(req, res){
 	if(req.param("admin")){
 		req.db.UserDetails.findByIdAndUpdate(req.param("userId"), { $set: { admin: req.param("admin") }}, function (err, user) {
 			req.session.notice = "Updated!";
@@ -23,6 +23,12 @@ router.get('/:userId', function(req, res){
 			res.render('adminuser', {user: req.user, usertoadmin: user});
 		});
 	}
+});
+
+router.get('/search', function(req, res) {
+		req.db.UserDetails.find({"username": new RegExp(req.param('hint'), "i")}, 'username',function(err,names){
+			res.send(names);
+		});
 });
 
 module.exports = router;

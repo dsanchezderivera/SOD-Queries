@@ -7,7 +7,10 @@ var Schema = mongoose.Schema;
 var UserDetail = new Schema({
 		username: String,
 		password: String,
+		firstname: String,
+		lastname: String,
 		email: String,
+		level: Number,
 		notifications: [{type: Schema.Types.ObjectId, ref: 'QueryNotifications'}],
 		admin: Boolean
     }, {

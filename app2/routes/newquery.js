@@ -19,6 +19,15 @@ router.post('/', function(req, res){
 		changes: false,
 		ack: false
 	});
+	if(req.body.additionalUsers !=""){
+		var additionalUsers = JSON.parse(req.body.additionalUsers);
+		
+		console.log(additionalUsers);
+		var index;
+		for (index = 0; index < additionalUsers.length; ++index) {
+			console.log(additionalUsers[index]);
+		}
+	}
 	req.db.UserDetails.update({_id: req.user._id},{$push: { 'notifications' : newquery._id }},{upsert:true}, function(err, data) {
 		if(err){ 
 			console.log("Error adding document to users DB");

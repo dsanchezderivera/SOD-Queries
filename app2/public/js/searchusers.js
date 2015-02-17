@@ -81,8 +81,11 @@ $(function(){
       xmlhttp_template.send();
     });
 
-
+    var addedUsers = [];
     $('.results_container').on('click','.user_link', function(e){
       $('#added_users').append('<li style="padding-top: 3px; padding-bottom: 3px">' + e.target.parentNode.id + '</li>')
+      addedUsers.push(e.target.id);
+      $('#addusers').val(JSON.stringify(addedUsers));
+      console.log(JSON.stringify(addedUsers));
     });
   });

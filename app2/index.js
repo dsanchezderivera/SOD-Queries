@@ -9,6 +9,7 @@ var express = require('express'),
     passport = require('passport'),
     LocalStrategy = require('passport-local'),
 	mongoose = require('mongoose/'),
+	crypto = require('crypto'),
 	Schema = mongoose.Schema;
 
 var app = express();
@@ -25,6 +26,7 @@ var r_newquery = require('./routes/newquery');
 var r_status = require('./routes/status');
 var r_metaquerygen = require('./routes/metaquerygen');
 var r_adminusers = require('./routes/adminusers');
+var r_profile = require('./routes/profile');
 
 //===============MQTT===============
 
@@ -45,7 +47,7 @@ passport.deserializeUser(function(id, done) {
 		}
 	});
 });
-
+//Strategy for user sign-in
 passport.use('local-signin', new LocalStrategy({passReqToCallback : true}, 
 	function(req, username, password, done) {
 	  process.nextTick(function() {
@@ -55,16 +57,17 @@ passport.use('local-signin', new LocalStrategy({passReqToCallback : true},
 			req.session.error = 'Could not log user in. Please try again.';
 			return done(err);
 		  }
-	 
+		  //If user not found
 		  if (!user) {
 		  console.log("Error; %s", err);
 		  console.log("COULD NOT LOG IN NOT USER %s se encontro: %s", username, user);
         req.session.error = 'Could not log user in. Please try again.';
 			return done(null, false);
 		  }
-	 
-		  if (user.password != password) {
-		  console.log("COULD NOT LOG IN BAD PASSWORD");
+		  var  md5pass = crypto.createHash('md5').update(password).digest("hex"); 
+		  //if pass incorrect
+		  if (user.password != md5pass) {
+		  console.log("COULD NOT LOG IN BAD PASSWORD:");
         req.session.error = 'Could not log user in. Please try again.';
 			return done(null, false);
 		  }
@@ -92,11 +95,13 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 			req.session.error = 'That username is already in use, please try a different one.';
 			return done(null, null);
 		  }
-		  
+		  var  md5pass = crypto.createHash('md5').update(password).digest("hex");
 		  var userdata = new dbmodel.UserDetails({
 			  username: username
-			, password: password
-			, email: 'test@test.test'
+			, password: md5pass
+			, email: req.body.email
+			, firstname: req.body.firstname
+			, lastname: req.body.lastname
 			, admin: false
 			});
 		
@@ -109,7 +114,7 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 		
 		console.log("Añadir user ok" + username);
         req.session.success = 'You are successfully logged in ' + username + '!';
-		return done(null, username);
+		return done(null, userdata);
 		});
 	});
 }));
@@ -164,6 +169,7 @@ app.use('/newquery', r_newquery);
 app.use('/status', r_status);
 app.use('/metaquerygen', r_metaquerygen);
 app.use('/adminusers', r_adminusers);
+app.use('/profile', r_profile);
 
 
 //sends the request through our local signup strategy, and if successful takes user to homepage, otherwise returns then to signin page

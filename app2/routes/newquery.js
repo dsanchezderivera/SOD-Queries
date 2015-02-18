@@ -25,7 +25,12 @@ router.post('/', function(req, res){
 		console.log(additionalUsers);
 		var index;
 		for (index = 0; index < additionalUsers.length; ++index) {
-			console.log(additionalUsers[index]);
+			newquery.users.push(additionalUsers[index]);
+			req.db.UserDetails.update({_id: additionalUsers[index]},{$push: { 'notifications' : newquery._id }},{upsert:true}, function(err, data) {
+				if(err){ 
+					console.log("Error adding document to an additional user DB");
+				}	
+			});
 		}
 	}
 	req.db.UserDetails.update({_id: req.user._id},{$push: { 'notifications' : newquery._id }},{upsert:true}, function(err, data) {

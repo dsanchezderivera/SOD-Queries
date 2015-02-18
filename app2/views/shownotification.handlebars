@@ -11,11 +11,10 @@
 	<p><i>End point:</i> {{infonotification.queryEndpoint}} </p>
 	<p><i>Query:</i> {{infonotification.query}} </p>
 	<a data-toggle="collapse" href="#results" class="btn btn-default btn-md" role="button">Show result data</a>
-	<a href="#" class="btn btn-default btn-md" role="button">Display results</a>
   <div id="results" class="collapse">
     <div id="result-data"></div>
     <br>
-    <div id="mapdiv" style="height: 400px;"></div>
+    <div id="mapdiv" style="height: 400px; display:none;"></div>
   </div>
   <br></br>
   <p><i>Last Updated:</i> {{infonotification.lastupdated}} </p>
@@ -114,6 +113,7 @@ var result_style = OpenLayers.Util.applyDefaults({
 var map, vectors, proj, format;
 $('.show_button').on('click', function(e){
   if(!map){
+    $('#mapdiv').css('display','block');
     //map creation
     map = new OpenLayers.Map("mapdiv", {
       controls: [

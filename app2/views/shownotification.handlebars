@@ -105,33 +105,51 @@ document.getElementById("result-data").innerHTML = html;
 </script>
 <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 <script>
+var result_style = OpenLayers.Util.applyDefaults({ 
+ strokeWidth: 3, 
+ strokeColor: "#ff0000", 
+ fillOpacity: 0 
+}, OpenLayers.Feature.Vector.style['default']); 
+
+var map, vectors, proj, format;
 $('.show_button').on('click', function(e){
-    map = new OpenLayers.Map("mapdiv");
-  map.addLayer(new OpenLayers.Layer.OSM());
-
-  wktFormat = new OpenLayers.Format.WKT();
-
-  var vectorLayer = new OpenLayers.Layer.Vector("WKT", {
-    protocol: new OpenLayers.Protocol.HTTP({
-      url: "./wkt-example.wkt",
-      format: wktFormat
-    }),
-    strategies: [new OpenLayers.Strategy.Fixed()]
-  });
-
-  map.addLayer(vectorLayer);
-
-  //Set start centrepoint and zoom
-  //TODO: Is it possible to just zoom to extents of KML objects instead?
+  if(!map){
+    //map creation
+    map = new OpenLayers.Map("mapdiv", {
+      controls: [
+      new OpenLayers.Control.Navigation(),
+      new OpenLayers.Control.PanZoomBar(),
+      new OpenLayers.Control.Attribution()],
+      allOverlays: true
+    });
+    //projection
+    proj = new OpenLayers.Projection("EPSG:4326");
+    //baselayer
+    var wms2 = new OpenLayers.Layer.OSM();
+    map.addLayer(wms2);
+    //vector layer
+    vectors = new OpenLayers.Layer.Vector("Vector Layer");
+    format = new OpenLayers.Format.WKT({
+      'internalProjection': map.baseLayer.projection,
+      'externalProjection': proj
+    });
+  }
+  //clicked id
+  var button_id = (e.target.id).split("_");
+  //wkt string
+  var wktstring = json.results.bindings[button_id[1]]['fWKT'].value;
+  console.log(wktstring);
+  //Parsing wktstring
   
-  var lonLat = new OpenLayers.LonLat( -0.1279688 ,51.5077286 )
-  .transform(
-          new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-          map.getProjectionObject() // to Spherical Mercator Projection
-          );
-  var zoom=16;
-  map.setCenter (lonLat, zoom);  
-  });
+  var feature = format.read(wktstring);
+
+  //get bounds
+  var bounds = feature.geometry.getBounds();
+
+  vectors.addFeatures([feature]);
+  map.addLayers([vectors]);
+  map.zoomToExtent(bounds); 
+});
 
 </script>
 {{else}}

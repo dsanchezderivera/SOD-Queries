@@ -17,6 +17,7 @@ router.post('/', function(req, res){
 		lastupdated: new Date,
 		lastresult: "empty",
 		changes: false,
+		usersWithChanges:[],
 		ack: false
 	});
 	if(req.body.additionalUsers !=""){

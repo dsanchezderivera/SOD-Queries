@@ -37,6 +37,7 @@ var QueryNotification = new Schema({
 		lastupdated: { type: Date, default: Date.now },
 		lastresult: String,
 		changes: Boolean,
+		usersWithChanges: [{type: Schema.Types.ObjectId, ref: 'UserDetails'}],
 		ack: Boolean
     }, {
 		collection: 'querynotifications'

@@ -214,13 +214,18 @@ mqttc.mqttclient.on('message', function(topic, message) {
 	if(topic == 'queryupdates'){
 		var objJson = JSON.parse(message);
 		console.log("!!!!!!!!!!!!!!!!!!!MQTT Udpate received for id: "+objJson._id);
-		dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, { $set: { 
-			lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes }}, function (err, querydata) {
-			if(!err){ 
-				console.log("Update added to BD");
-			}else{
-				console.log("Error adding document to notifications DB from MQTT");
-			}
+		dbmodel.QueryNotifications.findById(objJson._id,'users', function(err, Qusers){
+			dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, 
+				{ 
+					$set: { lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes },
+					$addToSet: { usersWithChanges: { $each: Qusers.users } }
+				}, function (err, querydata) {
+				if(!err){
+					console.log("Update added to BD");
+				}else{
+					console.log("Error adding document to notifications DB from MQTT");
+				}
+			});
 		});
 	}
 	//===============MQTT Receive ACKs=================
@@ -250,7 +255,7 @@ io.on('connection', function(socket){
   console.log('a user connected');
 	socket.on('message', function(msg){
 		console.log('new message: '+msg);
-		dbmodel.QueryNotifications.count({users: {$in:[msg]}, changes: true},function(err, count){
+		dbmodel.QueryNotifications.count({usersWithChanges: {$in:[msg]}},function(err, count){
 			if(!err){ 
 				if(count != 0)
 					socket.send('Ack received');

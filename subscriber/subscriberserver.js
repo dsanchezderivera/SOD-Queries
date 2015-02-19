@@ -154,7 +154,7 @@ var routineTimer = setTimeout(function() {
 			}	
 			//console.log(doc);
 			parseurl = url.parse(doc.queryEndpoint);
-			console.log('URL: ' + JSON.stringify(parseurl));
+			//console.log('URL: ' + JSON.stringify(parseurl));
 			var options = {
 				hostname: parseurl.hostname,
 				path: parseurl.path+'?query=' + encodeURIComponent(doc.query),
@@ -164,7 +164,7 @@ var routineTimer = setTimeout(function() {
     				'Accept': 'application/sparql-results+json'
  				}
 			};
-			console.log('URL: '+options.hostname + options.path+options.search);
+			//console.log('URL: '+options.hostname + options.path+options.search);
 			//=========HTTPGET============== (Fetching data and publishing if ok)
 			http.get(options, function(res) {
 				var objJson2 = doc;
@@ -175,7 +175,7 @@ var routineTimer = setTimeout(function() {
 				res.on('data', function (chunk) {
 					body += chunk;
 				});
-				console.log('BODY: '+body);
+				//console.log('BODY: '+body);
 				res.on('end', function(){
 					if(res.statusCode == 200){
 						if(body != objJson2.lastresult){

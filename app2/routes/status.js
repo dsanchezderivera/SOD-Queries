@@ -2,7 +2,12 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res){
-	req.db.QueryNotifications.find({"users": req.user._id},null, {sort: {queryName: 1}}, function(err, notificationlist){
+	req.db.QueryNotifications.find({"users": req.user._id},"-lastresult -query", {sort: {queryName: 1}}, function(err, notificationlist){
+		for (var i in notificationlist) {
+			if(notificationlist[i].usersWithChanges.indexOf(req.user._id) != -1){
+				notificationlist[i].changes = true;
+			}
+		}
 		//console.log("Getting notifications: " + notificationlist);
 		res.render('status', {user: req.user, notifications: notificationlist});
 	});
@@ -10,7 +15,7 @@ router.get('/', function(req, res){
 });
 
 router.get('/:notId', function(req, res){
-		req.db.QueryNotifications.findByIdAndUpdate(req.param("notId"), {$set: {changes: false}}, function(err, not){
+		req.db.QueryNotifications.findByIdAndUpdate(req.param("notId"), {$set: {changes: false}, $pull: { usersWithChanges: req.user._id }}, function(err, not){
 			if(err){
 				console.log("Error getting document"+err);
 				req.session.error = 'Error deleting'+err;

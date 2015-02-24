@@ -2,6 +2,9 @@
 {{#if user}}
 
 <script src="/js/bootbox.min.js"></script>
+<script src="/js/codemirror.js"></script>
+<script src="/js/sparql.js"></script>
+<link rel="stylesheet" href="/lib/codemirror.css">
 <div class="page-header">
   <h1>Notification</h1>
 </div>
@@ -9,10 +12,12 @@
 <div class="col-sm-offset-1">
 	<h3> Notification: <b>{{infonotification.queryName}}</b></h3>
 	<p><i>End point:</i> {{infonotification.queryEndpoint}} </p>
-	<p><i>Query:</i> {{infonotification.query}} </p>
+	<p><i>Query:</i></p> 
+  <textarea id="code">{{infonotification.query}}</textarea>
+  <div id="output"></div>
 	<a data-toggle="collapse" href="#results" class="btn btn-default btn-md" role="button">Show result data</a>
   <div id="results" class="collapse">
-    <div id="result-data" style="overflow: scroll;"></div>
+    <div id="result-data" style="overflow: scroll; max-height: 400px;"></div>
     <br>
     <div id="mapdiv" style="height: 400px; display:none;"></div>
   </div>
@@ -68,6 +73,18 @@
 
 </div>
 <script type="text/javascript">
+
+  //CodeMirror.runMode(document.getElementById("code").value, "application/x-sparql-query",document.getElementById("output"));
+
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: "application/x-sparql-query",
+        tabMode: "indent",
+        matchBrackets: true,
+        lineWrapping: true,
+        readOnly: true
+      });
+    
+
 $('#delete').submit(function(e) {
   var currentForm = this;
   e.preventDefault();

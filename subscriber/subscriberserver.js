@@ -157,7 +157,7 @@ var routineTimer = setTimeout(function() {
 			//console.log('URL: ' + JSON.stringify(parseurl));
 			var options = {
 				hostname: parseurl.hostname,
-				path: parseurl.path+'?query=' + encodeURIComponent(doc.query),
+				path: parseurl.path+'?query=' + encodeURIComponent(doc.query)+'&output=json',
 				port: parseurl.port,
 				method: 'GET',
 				headers: {

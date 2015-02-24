@@ -215,23 +215,41 @@ mqttc.mqttclient.on('message', function(topic, message) {
 		var objJson = JSON.parse(message);
 		console.log("!!!!!!!!!!!!!!!!!!!MQTT Udpate received for id: "+objJson._id);
 		dbmodel.QueryNotifications.findById(objJson._id,'users', function(err, Qusers){
-			dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, 
-				{ 
-					$set: { lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes },
-					$addToSet: { usersWithChanges: { $each: Qusers.users } }
-				}, function (err, querydata) {
-				if(!err){
-					console.log("Update added to BD");
+			if(err){ 
+				console.log("error finding the query: "+err);
+			}else{
+				if(Qusers!=null){
+					dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, 
+						{ 
+							$set: { lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes },
+							$addToSet: { usersWithChanges: { $each: Qusers.users } }
+						}, function (err, querydata) {
+						if(!err){
+							console.log("Update added to BD");
+						}else{
+							console.log("Error adding document to notifications DB from MQTT");
+						}
+					});
 				}else{
-					console.log("Error adding document to notifications DB from MQTT");
+					dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, 
+						{ 
+							$set: { lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes }
+						}, function (err, querydata) {
+						if(!err){
+							console.log("Update added to BD.....Qusers=null");
+						}else{
+							console.log("Error adding document to notifications DB from MQTT");
+						}
+					});
 				}
-			});
+			}
 		});
+	io.send('Ack received');
 	}
 	//===============MQTT Receive ACKs=================
 	else if(topic == 'queryacks'){
 		console.log("ACK received for id: "+message);
-		io.send('Ack received');
+		//io.send('Ack received');
 		dbmodel.QueryNotifications.findByIdAndUpdate(message, { $set: { ack: true }}, function (err, querydata) {
 			if(!err){ 
 				console.log("ACK Update added to BD");

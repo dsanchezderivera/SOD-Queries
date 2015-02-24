@@ -41,7 +41,9 @@ router.post('/', function(req, res){
 	});
 	newquery.save(function(err,newquerydata){
 		if(err){ 
-			console.log("Error adding document to notifications DB at newquery");
+			console.log("Error adding document to notifications DB from newquery POST");
+		}else{
+			console.log("New Query Notification added to DB from new query POST");
 		}
 	});
 	

@@ -67,18 +67,19 @@ mqttclient.on('message', function(topic, message, packet) {
 					mqttclient.publish('queryacks', objJson._id);
 				});
 		console.log("ObjetoJSON.query: "+ objJson.query);
+		var parseurl = url.parse(objJson.queryEndpoint);
 		var options = {
-			hostname: objJson.queryEndpoint,
-			path: ("?query=" + encodeURIComponent(objJson.query)) ,
-			method: 'GET',
-			headers: {
-    			'Accept': 'application/json',
- 			}
-		};
-		var urlstring = options.hostname + options.path;
+				hostname: parseurl.hostname,
+				path: parseurl.path+'?query=' + encodeURIComponent(objJson.query)+'&output=json',
+				port: parseurl.port,
+				method: 'GET',
+				headers: {
+    				'Accept': 'application/sparql-results+json'
+ 				}
+			};
 		console.log("STRING: "+ urlstring);
 		//=========HTTPGET============== (Fetching data and publishing if ok)
-		http.get(urlstring, function(res) {
+		http.get(options, function(res) {
 			var objJson2 = objJson;
 			console.log('STATUS: ' + res.statusCode);
 			console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -153,7 +154,7 @@ var routineTimer = setTimeout(function() {
 				return;
 			}	
 			//console.log(doc);
-			parseurl = url.parse(doc.queryEndpoint);
+			var parseurl = url.parse(doc.queryEndpoint);
 			//console.log('URL: ' + JSON.stringify(parseurl));
 			var options = {
 				hostname: parseurl.hostname,

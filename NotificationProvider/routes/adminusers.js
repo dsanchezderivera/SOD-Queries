@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
+/* GET a list of users. */
 router.get('/', function(req, res){
 	req.db.Groups.find({}, {"users":1}, null, function(err, data){
 		
@@ -12,6 +13,7 @@ router.get('/', function(req, res){
 	});
 });
 
+/* GET a specific user. */
 router.get('/admin/:userId', function(req, res){
 	if(req.param("admin")){
 		req.db.UserDetails.findByIdAndUpdate(req.param("userId"), { $set: { admin: req.param("admin") }}, function (err, user) {

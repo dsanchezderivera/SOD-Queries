@@ -78,7 +78,7 @@ passport.use('local-signin', new LocalStrategy({passReqToCallback : true},
 		});
 	});
 }));
-
+//Strategy for user sign-up
 passport.use('local-signup', new LocalStrategy({passReqToCallback : true}, 
 	function(req, username, password, done) {
 	  process.nextTick(function() {
@@ -95,6 +95,7 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 			req.session.error = 'That username is already in use, please try a different one.';
 			return done(null, null);
 		  }
+		  //Convert pass into md5 hash
 		  var  md5pass = crypto.createHash('md5').update(password).digest("hex");
 		  var userdata = new dbmodel.UserDetails({
 			  username: username
@@ -104,7 +105,7 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 			, lastname: req.body.lastname
 			, admin: false
 			});
-		
+		//saving new user
 		userdata.save(function(err,userdetail){
 			if(err){ 
 				console.log("Error adding document to DB");

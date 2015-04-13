@@ -2,11 +2,11 @@
   "name": "SubscriberSOD",
   "version": "0.0.1",
   "description": "Subscriber side SmartOpenData",
-  "main": "index.js",
+  "main": "dboperator.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "dsarco",
+  "author": "diego",
   "dependencies": {
    "express": "^4.9.5",
    "mongoose": "^3.8.17",

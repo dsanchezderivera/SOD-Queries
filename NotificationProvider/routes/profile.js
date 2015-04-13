@@ -2,10 +2,12 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 
+/* GET profile management page */
 router.get('/', function(req, res){
 	res.render('profile', {user: req.user});
 });
 
+/* POST profile update */
 router.post('/edit/', function(req, res){
 	//Check if old pass is correct
 	if(req.body.currentpassword == ""){
@@ -37,6 +39,7 @@ router.post('/edit/', function(req, res){
 	}
 });
 
+/* GET search results. Used with AJAX */
 router.get('/search', function(req, res) {
 	req.db.UserDetails.find({"username": new RegExp(req.param('hint'), "i")}, 'username',function(err,names){
 		res.send(names);

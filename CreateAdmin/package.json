@@ -1,0 +1,14 @@
+{
+  "name": "CreateAdmin",
+  "version": "0.0.1",
+  "description": "Create first admin user SmartOpenData",
+  "main": "createAdmin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "diego",
+  "dependencies": {
+    "bcryptjs": "^0.7.12",
+    "mongoose": "^3.8.17"
+  }
+}

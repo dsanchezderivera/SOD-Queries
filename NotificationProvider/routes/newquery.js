@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
+/* GET new query page. */
 router.get('/', function(req, res){
 	res.render('newquery', {user: req.user});
 });
 
+/* POST a new query. */
 router.post('/', function(req, res){
 	var newquery = new req.db.QueryNotifications({
 		queryName: req.body.name,
@@ -20,6 +21,7 @@ router.post('/', function(req, res){
 		usersWithChanges:[],
 		ack: false
 	});
+	//Adding additional users if required
 	if(req.body.additionalUsers !=""){
 		var additionalUsers = JSON.parse(req.body.additionalUsers);
 		
@@ -34,11 +36,13 @@ router.post('/', function(req, res){
 			});
 		}
 	}
+	//Updating actual user
 	req.db.UserDetails.update({_id: req.user._id},{$push: { 'notifications' : newquery._id }},{upsert:true}, function(err, data) {
 		if(err){ 
 			console.log("Error adding document to users DB");
 		}	
 	});
+	//Saving the new query
 	newquery.save(function(err,newquerydata){
 		if(err){ 
 			console.log("Error adding document to notifications DB from newquery POST");
@@ -48,7 +52,7 @@ router.post('/', function(req, res){
 	});
 	
 	var jsonstring = JSON.stringify(newquery, undefined, 2);
-	req.mqtt.publish('newqueriestopic', jsonstring);
+	req.mqtt.publish('newqueriestopic', jsonstring); //publishing to db operator
 	console.log(jsonstring);
 	res.redirect('/newquery');
 });

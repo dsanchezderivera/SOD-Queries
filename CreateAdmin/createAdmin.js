@@ -38,7 +38,7 @@ var UserDetail = new Schema({
     });
 var UserDetails = mongoose.model('usercollection', UserDetail);
 
-console.log("Creating admin user with password secret...");
+console.log("Creating; user: admin, password: secret");
 
 var  md5pass = crypto.createHash('md5').update('secret').digest("hex");
 var userdata = new dbmodel.UserDetails({

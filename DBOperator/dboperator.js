@@ -5,7 +5,8 @@ var express = require('express'),
 	mqttclient = mqtt.createClient(),
 	http = require("http"),
 	https = require("https"),
-	url = require("url");
+	url = require("url"),
+	async = require('async');
 	
 	
 	
@@ -144,71 +145,80 @@ mqttclient.on('message', function(topic, message, packet) {
 //===========================================================================================
 
 //===============Compare routine===============
-var repeatTime = 10000;
-var routineTimer = setTimeout(function() {
+
+var repeatTime = 60000; // Time for repeat the compare routine (60000 = 1 min)
+
+function compare() {
 	console.log("Routine started");
-	QueryNotifications.collection.find({active:true}, function(err, cursor){
-	
-		cursor.each (function(err,doc){
-			if(doc === null) {
-				return;
-			}	
-			//console.log(doc);
-			var parseurl = url.parse(doc.queryEndpoint);
-			//console.log('URL: ' + JSON.stringify(parseurl));
-			var options = {
-				hostname: parseurl.hostname,
-				path: parseurl.path+'?query=' + encodeURIComponent(doc.query)+'&output=json',
-				port: parseurl.port,
-				method: 'GET',
-				headers: {
-    				'Accept': 'application/sparql-results+json'
- 				}
-			};
-			//console.log('URL: '+options.hostname + options.path+options.search);
-			//=========HTTPGET============== (Fetching data and publishing if ok)
-			http.get(options, function(res) {
-				var objJson2 = doc;
-				console.log('STATUS: ' + res.statusCode + '. For id: '+doc._id);
-				console.log('HEADERS: ' + JSON.stringify(res.headers));
-				res.setEncoding('utf8');
-				var body = "";
-				res.on('data', function (chunk) {
-					body += chunk;
-				});
-				//console.log('BODY: '+body);
-				res.on('end', function(){
-					if(res.statusCode == 200){
-						if(body != objJson2.lastresult){
-							console.log('NOT THE SAME; UPDATING AND PUBLISHING');
-							objJson2.lastresult = body;
-							objJson2.lastupdated = new Date;
-							objJson2.changes = true;
-							var jsonstring = JSON.stringify(objJson2, undefined, 2);
-							//console.log("OBJECT: " + jsonstring);
-							//If response ok, publish data
-							mqttclient.publish('queryupdates', jsonstring);
-							console.log("Published to Topic: queryupdates");
-							QueryNotifications.findByIdAndUpdate(objJson2._id, { $set: { 
-								lastresult: objJson2.lastresult, lastupdated: objJson2.lastupdated, changes : objJson2.changes }}, function (err, querydata) {
-								if(!err){ 
-									console.log("Update added to BD on serverside");
-								}else{
-									console.log("Error adding document to notifications DB on serverside"+ err);
-								}
-							});
-						}else{
-							console.log('SAME STRING!!');
+	QueryNotifications.find({active:true}).lean().exec(function(err, cursor){
+
+		//Wait async calls for end the current execution
+		async.each(cursor,	
+			function(doc,callback){
+				if(doc === null) {
+					callback();
+					return;
+				}	
+				var parseurl = url.parse(doc.queryEndpoint);
+				//query options
+				var options = {
+					hostname: parseurl.hostname,
+					path: parseurl.path+'?query=' + encodeURIComponent(doc.query)+'&output=json',
+					port: parseurl.port,
+					method: 'GET',
+					headers: {
+	    				'Accept': 'application/sparql-results+json' //Accept only json results
+	 				}
+				};
+				//console.log('URL: '+options.hostname + options.path+options.search);
+				//=========HTTPGET============== (Fetching data and publishing if ok)
+				http.get(options, function(res) {
+					var objJson2 = doc;
+					console.log('STATUS: ' + res.statusCode + '. For id: '+doc._id);
+					//console.log('HEADERS: ' + JSON.stringify(res.headers));
+					res.setEncoding('utf8');
+					var body = "";
+					res.on('data', function (chunk) {
+						body += chunk;
+					});
+					//console.log('BODY: '+body);
+					res.on('end', function(){
+						if(res.statusCode == 200){
+							if(body != objJson2.lastresult){
+								console.log('NOT THE SAME; UPDATING AND PUBLISHING');
+								objJson2.lastresult = body;
+								objJson2.lastupdated = new Date;
+								objJson2.changes = true;
+								var jsonstring = JSON.stringify(objJson2, undefined, 2);
+								//console.log("OBJECT: " + jsonstring);
+								//If response ok, publish data
+								mqttclient.publish('queryupdates', jsonstring);
+								console.log("Published to Topic: queryupdates");
+								QueryNotifications.findByIdAndUpdate(objJson2._id, { $set: { 
+									lastresult: objJson2.lastresult, lastupdated: objJson2.lastupdated, changes : objJson2.changes }}, function (err, querydata) {
+									if(!err){ 
+										console.log("Update added to BD on serverside");
+									}else{
+										console.log("Error adding document to notifications DB on serverside"+ err);
+									}
+								});
+							}else{
+								console.log('SAME STRING!!');
+							}
 						}
-					}
-				})
-			}).on('error', function(e) {
-				console.log("Got error: " + e.message);
-			});
-		});
+						callback();
+					})
+				}).on('error', function(e) {
+					console.log("Got error: " + e.message);
+					callback();
+				});
+			},function(err){
+   				console.log("Routine ended");
+   				//set timer again
+				routineTimer = setTimeout(function(){compare()}, repeatTime);
+  			});
 	});
-	//mqttclient.publish('queryacks', "test");	
-	console.log("Routine ended");
-	routineTimer = setTimeout(arguments.callee, repeatTime*4);
-}, repeatTime);
+}
+
+var routineTimer = setTimeout(function(){compare()}, repeatTime);
 

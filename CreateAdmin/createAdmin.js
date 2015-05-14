@@ -41,7 +41,7 @@ var UserDetails = mongoose.model('usercollection', UserDetail);
 console.log("Creating; user: admin, password: secret");
 
 var  md5pass = crypto.createHash('md5').update('secret').digest("hex");
-var userdata = new dbmodel.UserDetails({
+var userdata = new UserDetails({
   username: 'admin'
 , password: md5pass
 , email: 'admin@example.com'

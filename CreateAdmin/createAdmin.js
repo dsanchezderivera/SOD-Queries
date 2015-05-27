@@ -2,10 +2,13 @@ var	mongoose = require('mongoose/'),
 	crypto = require('crypto'),
 	Schema = mongoose.Schema;
 	
-//Create and admin user for the notification system
+/**
+ * Create and admin user for the notification system
+ */
 
 //===============MONGODB===============
 mongoose.connect('mongodb://localhost/appdatabase');
+
 
 var QueryNotification = new Schema({
 		queryName: String,
@@ -42,12 +45,12 @@ console.log("Creating; user: admin, password: secret");
 
 var  md5pass = crypto.createHash('md5').update('secret').digest("hex");
 var userdata = new UserDetails({
-  username: 'admin'
-, password: md5pass
-, email: 'admin@example.com'
-, firstname: 'Admin'
-, lastname: 'Administrator'
-, admin: true
+  username: 'admin',
+  password: md5pass,
+  email: 'admin@example.com',
+  firstname: 'Admin',
+  lastname: 'Administrator',
+  admin: true
 });
 console.log("Adding to users DB");
 userdata.save(function(err,user){

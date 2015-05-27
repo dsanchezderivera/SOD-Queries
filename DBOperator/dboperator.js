@@ -7,10 +7,8 @@ var express = require('express'),
 	https = require("https"),
 	url = require("url"),
 	async = require('async');
-	
-	
-	
-	
+
+
 //===============MONGODB===============
 mongoose.connect('mongodb://localhost:27018/serverdatabase');
 
@@ -29,9 +27,8 @@ var QueryNotification = new Schema({
     }, {
 		collection: 'querynotifications'
     });
+
 var QueryNotifications = mongoose.model('querynotifications', QueryNotification);
-
-
 
 	
 //===============MQTT===============
@@ -92,7 +89,7 @@ mqttclient.on('message', function(topic, message, packet) {
 			res.on('end', function(){
 				//console.log('BODY: ' + body);
 				objJson2.lastresult = body;
-				objJson2.lastupdated = new Date;
+				objJson2.lastupdated = new Date();
 				objJson2.changes = true;
 				var jsonstring = JSON.stringify(objJson2, undefined, 2);
 				//console.log("OBJECT: " + jsonstring);
@@ -108,7 +105,7 @@ mqttclient.on('message', function(topic, message, packet) {
 						console.log("Error adding document to notifications DB at first httpget");
 					}
 				});
-			})
+			});
 		}).on('error', function(e) {
 			console.log("Got error: " + e.message);
 		});
@@ -187,7 +184,7 @@ function compare() {
 							if(body != objJson2.lastresult){
 								console.log('NOT THE SAME; UPDATING AND PUBLISHING');
 								objJson2.lastresult = body;
-								objJson2.lastupdated = new Date;
+								objJson2.lastupdated = new Date();
 								objJson2.changes = true;
 								var jsonstring = JSON.stringify(objJson2, undefined, 2);
 								//console.log("OBJECT: " + jsonstring);
@@ -207,7 +204,7 @@ function compare() {
 							}
 						}
 						callback();
-					})
+					});
 				}).on('error', function(e) {
 					console.log("Got error: " + e.message);
 					callback();
@@ -215,10 +212,10 @@ function compare() {
 			},function(err){
    				console.log("Routine ended");
    				//set timer again
-				routineTimer = setTimeout(function(){compare()}, repeatTime);
+				routineTimer = setTimeout(function(){compare();}, repeatTime);
   			});
 	});
 }
 
-var routineTimer = setTimeout(function(){compare()}, repeatTime);
+var routineTimer = setTimeout(function(){compare();}, repeatTime);
 

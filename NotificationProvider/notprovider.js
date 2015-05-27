@@ -98,12 +98,12 @@ passport.use('local-signup', new LocalStrategy({passReqToCallback : true},
 		  //Convert pass into md5 hash
 		  var  md5pass = crypto.createHash('md5').update(password).digest("hex");
 		  var userdata = new dbmodel.UserDetails({
-			  username: username
-			, password: md5pass
-			, email: req.body.email
-			, firstname: req.body.firstname
-			, lastname: req.body.lastname
-			, admin: false
+			username: username,
+			password: md5pass,
+			email: req.body.email,
+			firstname: req.body.firstname,
+			lastname: req.body.lastname,
+			admin: false
 			});
 		//saving new user
 		userdata.save(function(err,userdetail){
@@ -190,7 +190,7 @@ app.post('/login', passport.authenticate('local-signin', {
 //logs user out of site, deleting them from the session, and returns to homepage
 app.get('/logout', function(req, res){
   var name = req.user.username;
-  console.log("LOGGIN OUT " + req.user.username)
+  console.log("LOGGIN OUT " + req.user.username);
   req.logout();
   res.redirect('/');
   req.session.notice = "You have successfully been logged out " + name + "!";
@@ -219,7 +219,7 @@ mqttc.mqttclient.on('message', function(topic, message) {
 			if(err){ 
 				console.log("error finding the query: "+err);
 			}else{
-				if(Qusers!=null){
+				if(Qusers!==null){
 					dbmodel.QueryNotifications.findByIdAndUpdate(objJson._id, 
 						{ 
 							$set: { lastresult: objJson.lastresult, lastupdated: objJson.lastupdated, changes:objJson.changes },
@@ -276,7 +276,7 @@ io.on('connection', function(socket){
 		console.log('new message: '+msg);
 		dbmodel.QueryNotifications.count({usersWithChanges: {$in:[msg]}},function(err, count){
 			if(!err){ 
-				if(count != 0)
+				if(count !== 0)
 					socket.send('Ack received');
 			}else{
 				console.log("error in query"+err);

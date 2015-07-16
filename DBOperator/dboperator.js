@@ -10,7 +10,7 @@ var express = require('express'),
 
 
 //===============MONGODB===============
-mongoose.connect('mongodb://localhost:27018/serverdatabase');
+mongoose.connect('mongodb://localhost/serverdatabase');
 
 var Schema = mongoose.Schema;
 
@@ -75,7 +75,6 @@ mqttclient.on('message', function(topic, message, packet) {
     				'Accept': 'application/sparql-results+json'
  				}
 			};
-		console.log("STRING: "+ urlstring);
 		//=========HTTPGET============== (Fetching data and publishing if ok)
 		http.get(options, function(res) {
 			var objJson2 = objJson;

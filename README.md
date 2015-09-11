@@ -6,6 +6,7 @@
 * Improve environmental data searchability thanks to integration of big data infrastructure for structured and semi-structured search facilities.
 * Provide a semantic front-end framework for environmental data visualization.
 * Notify query changes in a asynchronous method to allow complex SPARQL queries.
+* User administration.
 
 ## Modules ##
 
